@@ -1,0 +1,8 @@
+-- V1__init_guests.sql
+-- Migration: create guests table
+
+CREATE TABLE IF NOT EXISTS guests (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    invitation_id VARCHAR(255)
+);
