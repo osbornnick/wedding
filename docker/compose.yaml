@@ -1,7 +1,6 @@
 services:
   db:
-    image: postgres:15
-    restart: unless-stopped
+    image: postgres:18.2
     environment:
       POSTGRES_DB: "wedding"
       POSTGRES_USER: "postgres"
@@ -9,7 +8,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
   adminer:
     image: adminer:latest
     restart: always
@@ -17,7 +16,6 @@ services:
       - "8080:8080"
   flyway:
     image: flyway/flyway:latest
-    # restart: unless-stopped
     command: -url=jdbc:postgresql://db:5432/wedding -schemas=public -user=postgres -password=postgres migrate
     depends_on:
       - db

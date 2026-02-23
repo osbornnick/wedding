@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS responses (
     attending_friday_count INTEGER NOT NULL DEFAULT 0,
     attending_brunch BOOLEAN NOT NULL DEFAULT FALSE,
     attending_brunch_count INTEGER NOT NULL DEFAULT 0,
-    dietary_restrictions TEXT
+    dietary_restrictions TEXT,
+    invitation_id INTEGER NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

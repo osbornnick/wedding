@@ -9,5 +9,7 @@ CREATE TABLE IF NOT EXISTS gifts (
     progress NUMERIC(10,2) DEFAULT 0.00,
     total NUMERIC(10,2) DEFAULT 0.00,
     purchased BOOLEAN DEFAULT FALSE,
-    description TEXT
+    description TEXT,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
