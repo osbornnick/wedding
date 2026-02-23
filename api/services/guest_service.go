@@ -100,24 +100,31 @@ func (s *GuestService) Delete(id int) error {
 	return nil
 }
 
-func (s *GuestService) FuzzySearchByName(name string) ([]string, error) {
+func (s *GuestService) FuzzySearchByName(name string) ([]models.Guest, error) {
 	all, err := s.GetAll()
 	if err != nil {
 		return nil, fmt.Errorf("GuestService.FuzzySearchByName: %w", err)
 	}
 	words := []string{}
+	guestMap := map[string]*models.Guest{}
 	for _, g := range all {
 		words = append(words, g.Name)
+		guestMap[g.Name] = &g
 		for _, a := range g.Aliases {
 			words = append(words, a)
+			guestMap[a] = &g
 		}
 	}
 	matches := fuzzy.RankFindNormalizedFold(name, words)
-	results := []string{}
+	results := []models.Guest{}
 	sort.Sort(matches)
 	log.Printf("matches for fuzzy search: %v", matches)
+	log.Printf("guest map: %v", guestMap)
 	for _, match := range matches {
-		results = append(results, match.Target)
+		log.Printf("checking match: %v", match)
+		if g, ok := guestMap[match.Target]; ok {
+			results = append(results, *g)
+		}
 	}
 	return results, nil
 }
