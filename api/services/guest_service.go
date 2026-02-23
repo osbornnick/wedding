@@ -5,9 +5,12 @@ package services
 import (
 	"context"
 	"fmt"
+	"log"
+	"sort"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/lithammer/fuzzysearch/fuzzy"
 
 	"wedding/services/models"
 )
@@ -95,4 +98,26 @@ func (s *GuestService) Delete(id int) error {
 		return pgx.ErrNoRows
 	}
 	return nil
+}
+
+func (s *GuestService) FuzzySearchByName(name string) ([]string, error) {
+	all, err := s.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("GuestService.FuzzySearchByName: %w", err)
+	}
+	words := []string{}
+	for _, g := range all {
+		words = append(words, g.Name)
+		for _, a := range g.Aliases {
+			words = append(words, a)
+		}
+	}
+	matches := fuzzy.RankFindNormalizedFold(name, words)
+	results := []string{}
+	sort.Sort(matches)
+	log.Printf("matches for fuzzy search: %v", matches)
+	for _, match := range matches {
+		results = append(results, match.Target)
+	}
+	return results, nil
 }

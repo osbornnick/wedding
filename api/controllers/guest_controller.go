@@ -108,3 +108,17 @@ func (c *GuestController) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
+
+func (c *GuestController) FuzzySearchByName(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("name")
+	if name == "" {
+		writeError(w, http.StatusBadRequest, "name query parameter is required")
+		return
+	}
+	results, err := c.svc.FuzzySearchByName(name)
+	if err != nil {
+		writeError(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+	writeJSON(w, http.StatusOK, results)
+}

@@ -41,6 +41,7 @@ func New(
 
 		// Guests
 		r.Route("/guests", func(r chi.Router) {
+			r.Get("/search", guestCtrl.FuzzySearchByName)
 			r.Get("/", guestCtrl.GetAll)
 			r.Post("/", guestCtrl.Create)
 			r.Get("/{id}", guestCtrl.GetByID)
