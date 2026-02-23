@@ -24,7 +24,7 @@ func NewGuestService(db *pgxpool.Pool) *GuestService {
 
 // GetAll returns every guest record from the database.
 func (s *GuestService) GetAll() ([]models.Guest, error) {
-	rows, err := s.db.Query(context.Background(), `SELECT id, name, invitation_id FROM guests ORDER BY id`)
+	rows, err := s.db.Query(context.Background(), `SELECT id, name, invitation_id, aliases, created_at FROM guests ORDER BY id`)
 	if err != nil {
 		return nil, fmt.Errorf("GuestService.GetAll query: %w", err)
 	}
@@ -33,7 +33,7 @@ func (s *GuestService) GetAll() ([]models.Guest, error) {
 	var guests []models.Guest
 	for rows.Next() {
 		var g models.Guest
-		if err := rows.Scan(&g.ID, &g.Name, &g.InvitationID); err != nil {
+		if err := rows.Scan(&g.ID, &g.Name, &g.InvitationID, &g.Aliases, &g.CreatedAt); err != nil {
 			return nil, fmt.Errorf("GuestService.GetAll scan: %w", err)
 		}
 		guests = append(guests, g)
@@ -46,8 +46,8 @@ func (s *GuestService) GetByID(id int) (*models.Guest, error) {
 	var g models.Guest
 	err := s.db.QueryRow(
 		context.Background(),
-		`SELECT id, name, invitation_id FROM guests WHERE id = $1`, id,
-	).Scan(&g.ID, &g.Name, &g.InvitationID)
+		`SELECT id, name, invitation_id, aliases, created_at FROM guests WHERE id = $1`, id,
+	).Scan(&g.ID, &g.Name, &g.InvitationID, &g.Aliases, &g.CreatedAt)
 	if err != nil {
 		return nil, fmt.Errorf("GuestService.GetByID: %w", err)
 	}
@@ -58,8 +58,8 @@ func (s *GuestService) GetByID(id int) (*models.Guest, error) {
 func (s *GuestService) Create(g *models.Guest) (*models.Guest, error) {
 	err := s.db.QueryRow(
 		context.Background(),
-		`INSERT INTO guests (name, invitation_id) VALUES ($1, $2) RETURNING id`,
-		g.Name, g.InvitationID,
+		`INSERT INTO guests (name, invitation_id, aliases) VALUES ($1, $2, $3) RETURNING id`,
+		g.Name, g.InvitationID, g.Aliases,
 	).Scan(&g.ID)
 	if err != nil {
 		return nil, fmt.Errorf("GuestService.Create: %w", err)

@@ -11,6 +11,7 @@ type Guest struct {
 	ID           int       `json:"id"`
 	Name         string    `json:"name"`
 	InvitationID int       `json:"invitation_id"`
+	Aliases      []string  `json:"aliases"`
 	CreatedAt    time.Time `json:"created_at"`
 }
 

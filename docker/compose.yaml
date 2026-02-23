@@ -1,5 +1,5 @@
 services:
-  api:
+  wedding-api:
     build: ../api
     ports:
       - "8081:8080"
