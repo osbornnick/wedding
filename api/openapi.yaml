@@ -1,0 +1,642 @@
+openapi: 3.0.3
+
+info:
+    title: Wedding API
+    description: >
+        REST API for managing wedding guests, invitations, RSVP responses, and the
+        gift registry.  All resources live under `/api/v1`.
+    version: 1.0.0
+
+servers:
+    - url: http://localhost:8080
+      description: Local development server
+
+# ── Tags ──────────────────────────────────────────────────────────────────────
+tags:
+    - name: health
+      description: Service liveness check
+    - name: guests
+      description: Wedding guest records
+    - name: invitations
+      description: Household invitations
+    - name: responses
+      description: RSVP responses
+    - name: gifts
+      description: Gift registry items
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+paths:
+    # ── Health ─────────────────────────────────────────────────────────────────
+
+    /health:
+        get:
+            tags: [health]
+            summary: Health check
+            description: Returns `{"status":"ok"}` when the service is running.
+            operationId: getHealth
+            responses:
+                "200":
+                    description: Service is healthy
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    status:
+                                        type: string
+                                        example: ok
+
+    # ── Guests ─────────────────────────────────────────────────────────────────
+
+    /api/v1/guests/:
+        get:
+            tags: [guests]
+            summary: List all guests
+            operationId: listGuests
+            responses:
+                "200":
+                    description: Array of guest records
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Guest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        post:
+            tags: [guests]
+            summary: Create a guest
+            operationId: createGuest
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/GuestInput"
+            responses:
+                "201":
+                    description: Guest created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Guest"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    /api/v1/guests/{id}:
+        parameters:
+            - $ref: "#/components/parameters/IdParam"
+
+        get:
+            tags: [guests]
+            summary: Get a guest by ID
+            operationId: getGuest
+            responses:
+                "200":
+                    description: Guest record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Guest"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        put:
+            tags: [guests]
+            summary: Replace a guest
+            operationId: updateGuest
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Guest"
+            responses:
+                "200":
+                    description: Updated guest record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Guest"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        delete:
+            tags: [guests]
+            summary: Delete a guest
+            operationId: deleteGuest
+            responses:
+                "204":
+                    description: Guest deleted
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    # ── Invitations ────────────────────────────────────────────────────────────
+
+    /api/v1/invitations/:
+        get:
+            tags: [invitations]
+            summary: List all invitations
+            operationId: listInvitations
+            responses:
+                "200":
+                    description: Array of invitation records
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Invitation"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        post:
+            tags: [invitations]
+            summary: Create an invitation
+            operationId: createInvitation
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/InvitationInput"
+            responses:
+                "201":
+                    description: Invitation created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Invitation"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    /api/v1/invitations/{id}:
+        parameters:
+            - $ref: "#/components/parameters/IdParam"
+
+        get:
+            tags: [invitations]
+            summary: Get an invitation by ID
+            operationId: getInvitation
+            responses:
+                "200":
+                    description: Invitation record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Invitation"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        put:
+            tags: [invitations]
+            summary: Replace an invitation
+            operationId: updateInvitation
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/InvitationInput"
+            responses:
+                "200":
+                    description: Updated invitation record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Invitation"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        delete:
+            tags: [invitations]
+            summary: Delete an invitation
+            operationId: deleteInvitation
+            responses:
+                "204":
+                    description: Invitation deleted
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    # ── Responses (RSVP) ───────────────────────────────────────────────────────
+
+    /api/v1/responses/:
+        get:
+            tags: [responses]
+            summary: List all RSVP responses
+            operationId: listResponses
+            responses:
+                "200":
+                    description: Array of RSVP response records
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Response"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        post:
+            tags: [responses]
+            summary: Create an RSVP response
+            operationId: createResponse
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ResponseInput"
+            responses:
+                "201":
+                    description: RSVP response created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Response"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    /api/v1/responses/{id}:
+        parameters:
+            - $ref: "#/components/parameters/IdParam"
+
+        get:
+            tags: [responses]
+            summary: Get an RSVP response by ID
+            operationId: getResponse
+            responses:
+                "200":
+                    description: RSVP response record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Response"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        put:
+            tags: [responses]
+            summary: Replace an RSVP response
+            operationId: updateResponse
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/ResponseInput"
+            responses:
+                "200":
+                    description: Updated RSVP response record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Response"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        delete:
+            tags: [responses]
+            summary: Delete an RSVP response
+            operationId: deleteResponse
+            responses:
+                "204":
+                    description: RSVP response deleted
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    # ── Gifts ──────────────────────────────────────────────────────────────────
+
+    /api/v1/gifts/:
+        get:
+            tags: [gifts]
+            summary: List all gift registry items
+            operationId: listGifts
+            responses:
+                "200":
+                    description: Array of gift records
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Gift"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        post:
+            tags: [gifts]
+            summary: Create a gift registry item
+            operationId: createGift
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/GiftInput"
+            responses:
+                "201":
+                    description: Gift created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Gift"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    /api/v1/gifts/{id}:
+        parameters:
+            - $ref: "#/components/parameters/IdParam"
+
+        get:
+            tags: [gifts]
+            summary: Get a gift by ID
+            operationId: getGift
+            responses:
+                "200":
+                    description: Gift record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Gift"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        put:
+            tags: [gifts]
+            summary: Replace a gift registry item
+            operationId: updateGift
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/GiftInput"
+            responses:
+                "200":
+                    description: Updated gift record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Gift"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        delete:
+            tags: [gifts]
+            summary: Delete a gift registry item
+            operationId: deleteGift
+            responses:
+                "204":
+                    description: Gift deleted
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+# ── Components ────────────────────────────────────────────────────────────────
+components:
+    # ── Reusable parameters ───────────────────────────────────────────────────
+    parameters:
+        IdParam:
+            name: id
+            in: path
+            required: true
+            description: Integer primary key of the resource
+            schema:
+                type: integer
+                minimum: 1
+            example: 1
+
+    # ── Reusable responses ────────────────────────────────────────────────────
+    responses:
+        BadRequest:
+            description: The request body or path parameter is invalid
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/Error"
+
+        NotFound:
+            description: The requested resource does not exist
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/Error"
+
+        InternalServerError:
+            description: An unexpected server-side error occurred
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/Error"
+
+    # ── Schemas ───────────────────────────────────────────────────────────────
+    schemas:
+        # Shared error envelope returned on all non-2xx responses
+        Error:
+            type: object
+            properties:
+                error:
+                    type: string
+                    description: Human-readable error message
+                    example: guest not found
+            required: [error]
+
+        # ── Guest ────────────────────────────────────────────────────────────────
+        Guest:
+            description: Fields required to create or replace a guest
+            properties:
+                name:
+                    type: string
+                    description: Full name of the guest
+                    example: Jane Smith
+                invitation_id:
+                    type: string
+                    description: ID of the invitation this guest belongs to
+                    example: "42"
+                id:
+                    type: integer
+                    description: Auto-generated primary key
+                    example: 1
+                    readOnly: true
+            required: [name]
+
+        # ── Invitation ───────────────────────────────────────────────────────────
+
+        Invitation:
+            type: object
+            description: Fields required to create or replace an invitation
+            properties:
+                id:
+                    type: integer
+                    description: Auto-generated primary key
+                    example: 1
+                    readOnly: true
+                address:
+                    type: string
+                    description: Mailing address for this invitation
+                    example: 123 Main St, Springfield, IL 62701
+                num_guests:
+                    type: integer
+                    description: Number of guests included on this invitation
+                    example: 2
+                    minimum: 1
+            required: [address, num_guests]
+
+        # ── Response (RSVP) ──────────────────────────────────────────────────────
+
+        Response:
+            type: object
+            description: Fields required to create or replace an RSVP response
+            properties:
+              id:
+                type: integer
+                description: Auto-generated primary key
+                example: 1
+                readOnly: true
+            attending_wedding:
+                type: boolean
+                description: Whether the party is attending the wedding ceremony
+                default: false
+            attending_wedding_count:
+                type: integer
+                description: Number of people attending the wedding ceremony
+                default: 0
+                minimum: 0
+            attending_friday:
+                type: boolean
+                description: Whether the party is attending the Friday event
+                default: false
+            attending_friday_count:
+                type: integer
+                description: Number of people attending the Friday event
+                default: 0
+                minimum: 0
+            attending_brunch:
+                type: boolean
+                description: Whether the party is attending the post-wedding brunch
+                default: false
+            attending_brunch_count:
+                type: integer
+                description: Number of people attending the brunch
+                default: 0
+                minimum: 0
+            dietary_restrictions:
+                type: string
+                description: Free-text dietary restrictions or allergies
+                example: Vegetarian, nut allergy
+            invitation_id:
+                type: string
+                description: ID of the invitation this RSVP belongs to
+                example: "42"
+
+        # ── Gift ─────────────────────────────────────────────────────────────────
+
+        GiftInput:
+            type: object
+            description: Fields required to create or replace a gift registry item
+            properties:
+                img:
+                    type: string
+                    description: URL of a product image (up to 512 chars)
+                    example: https://example.com/images/mixer.jpg
+                name:
+                    type: string
+                    description: Name of the gift
+                    example: KitchenAid Stand Mixer
+                link:
+                    type: string
+                    description: URL to purchase the gift
+                    example: https://example.com/products/mixer
+                progress:
+                    type: number
+                    format: double
+                    description: Amount already contributed toward this gift
+                    default: 0.00
+                    minimum: 0
+                    example: 50.00
+                total:
+                    type: number
+                    format: double
+                    description: Total cost of the gift
+                    default: 0.00
+                    minimum: 0
+                    example: 349.99
+                purchased:
+                    type: boolean
+                    description: Whether the gift has been fully purchased
+                    default: false
+                description:
+                    type: string
+                    description: Optional description of the gift
+                    example: 5-quart tilt-head stand mixer in Empire Red
+            required: [name]
+
+        Gift:
+            allOf:
+                - type: object
+                  properties:
+                      id:
+                          type: integer
+                          description: Auto-generated primary key
+                          example: 1
+                          readOnly: true
+                  required: [id]
+                - $ref: "#/components/schemas/GiftInput"
