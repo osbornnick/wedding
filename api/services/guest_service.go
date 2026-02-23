@@ -5,7 +5,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"log"
 	"sort"
 
 	"github.com/jackc/pgx/v5"
@@ -118,10 +117,7 @@ func (s *GuestService) FuzzySearchByName(name string) ([]models.Guest, error) {
 	matches := fuzzy.RankFindNormalizedFold(name, words)
 	results := []models.Guest{}
 	sort.Sort(matches)
-	log.Printf("matches for fuzzy search: %v", matches)
-	log.Printf("guest map: %v", guestMap)
 	for _, match := range matches {
-		log.Printf("checking match: %v", match)
 		if g, ok := guestMap[match.Target]; ok {
 			results = append(results, *g)
 		}
