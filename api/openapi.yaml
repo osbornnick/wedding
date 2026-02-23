@@ -74,7 +74,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/GuestInput"
+                            $ref: "#/components/schemas/Guest"
             responses:
                 "201":
                     description: Guest created
@@ -175,7 +175,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/InvitationInput"
+                            $ref: "#/components/schemas/Invitation"
             responses:
                 "201":
                     description: Invitation created
@@ -219,7 +219,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/InvitationInput"
+                            $ref: "#/components/schemas/Invitation"
             responses:
                 "200":
                     description: Updated invitation record
@@ -276,7 +276,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/ResponseInput"
+                            $ref: "#/components/schemas/Response"
             responses:
                 "201":
                     description: RSVP response created
@@ -320,7 +320,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/ResponseInput"
+                            $ref: "#/components/schemas/Response"
             responses:
                 "200":
                     description: Updated RSVP response record
@@ -377,7 +377,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/GiftInput"
+                            $ref: "#/components/schemas/Gift"
             responses:
                 "201":
                     description: Gift created
@@ -421,7 +421,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: "#/components/schemas/GiftInput"
+                            $ref: "#/components/schemas/Gift"
             responses:
                 "200":
                     description: Updated gift record
@@ -546,11 +546,11 @@ components:
             type: object
             description: Fields required to create or replace an RSVP response
             properties:
-              id:
-                type: integer
-                description: Auto-generated primary key
-                example: 1
-                readOnly: true
+                id:
+                    type: integer
+                    description: Auto-generated primary key
+                    example: 1
+                    readOnly: true
             attending_wedding:
                 type: boolean
                 description: Whether the party is attending the wedding ceremony
@@ -589,10 +589,15 @@ components:
 
         # ── Gift ─────────────────────────────────────────────────────────────────
 
-        GiftInput:
+        Gift:
             type: object
             description: Fields required to create or replace a gift registry item
             properties:
+                id:
+                    type: integer
+                    description: Auto-generated primary key
+                    example: 1
+                    readOnly: true
                 img:
                     type: string
                     description: URL of a product image (up to 512 chars)
@@ -628,15 +633,3 @@ components:
                     description: Optional description of the gift
                     example: 5-quart tilt-head stand mixer in Empire Red
             required: [name]
-
-        Gift:
-            allOf:
-                - type: object
-                  properties:
-                      id:
-                          type: integer
-                          description: Auto-generated primary key
-                          example: 1
-                          readOnly: true
-                  required: [id]
-                - $ref: "#/components/schemas/GiftInput"

@@ -9,6 +9,12 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 2s
   adminer:
     image: adminer:latest
     restart: always
@@ -18,7 +24,8 @@ services:
     image: flyway/flyway:latest
     command: -url=jdbc:postgresql://db:5432/wedding -schemas=public -user=postgres -password=postgres migrate
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - ../schema/sql:/flyway/sql
 

@@ -10,7 +10,7 @@ import "time"
 type Guest struct {
 	ID           int       `json:"id"`
 	Name         string    `json:"name"`
-	InvitationID string    `json:"invitation_id"`
+	InvitationID int       `json:"invitation_id"`
 	CreatedAt    time.Time `json:"created_at"`
 }
 
