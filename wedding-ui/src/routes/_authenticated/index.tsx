@@ -1,10 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import Schedule from '../components/Schedule'
-import Travel from '../components/Travel'
-import RSVP from '../components/RSVP'
+import Schedule from '../../components/Schedule'
+import Travel from '../../components/Travel'
+import RSVP from '../../components/RSVP'
 
-export const Route = createFileRoute('/')({ component: Home })
+export const Route = createFileRoute('/_authenticated/')({ component: Home })
 
 const WEDDING_DATE = new Date('2027-05-15T15:00:00')
 

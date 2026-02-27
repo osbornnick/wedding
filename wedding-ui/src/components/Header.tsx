@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { logout } from '../lib/auth'
 
 const navLinks = [
   { to: '/', label: 'Home', exact: true },
@@ -9,6 +10,13 @@ const navLinks = [
 ] as const
 
 export default function Header() {
+  const navigate = useNavigate()
+
+  function handleLogout() {
+    logout()
+    navigate({ to: '/login' })
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/90 px-4 backdrop-blur-md shadow-sm">
       <nav className="mx-auto flex max-w-5xl items-center justify-between py-4">
@@ -31,6 +39,14 @@ export default function Header() {
               {label}
             </Link>
           ))}
+          {import.meta.env.DEV && (
+            <button
+              onClick={handleLogout}
+              className="rounded-md bg-stone-100 px-3 py-1 text-xs text-stone-500 transition hover:bg-stone-200 hover:text-stone-800"
+            >
+              Dev: Logout
+            </button>
+          )}
         </div>
       </nav>
     </header>

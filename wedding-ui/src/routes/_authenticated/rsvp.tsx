@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
-import RSVP from '../components/RSVP'
+import RSVP from '../../components/RSVP'
 
-export const Route = createFileRoute('/rsvp')({ component: RSVPPage })
+export const Route = createFileRoute('/_authenticated/rsvp')({ component: RSVPPage })
 
 function RSVPPage() {
   return (
