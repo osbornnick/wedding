@@ -1,5 +1,4 @@
 const AUTH_KEY = 'wedding_auth'
-const CORRECT_PASSWORD = '' // change this
 
 function isBrowser(): boolean {
   return typeof window !== 'undefined'
@@ -10,8 +9,16 @@ export function isAuthenticated(): boolean {
   return localStorage.getItem(AUTH_KEY) === 'true'
 }
 
-export function login(password: string): boolean {
-  if (password === CORRECT_PASSWORD) {
+export async function login(password: string): Promise<boolean> {
+  const response = await fetch('http://localhost:8081/api/v1/users/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ username: 'user', password: password }),
+  })
+  console.log(response)
+  if (response.ok) {
     if (isBrowser()) {
       localStorage.setItem(AUTH_KEY, 'true')
     }

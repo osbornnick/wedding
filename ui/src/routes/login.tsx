@@ -17,9 +17,9 @@ function LoginPage() {
     return null
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (login(password)) {
+    if (await login(password)) {
       navigate({ to: '/' })
     } else {
       setError(true)

@@ -6,6 +6,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 
 	"wedding/services/controllers"
 )
@@ -23,10 +24,17 @@ func New(
 	invitationCtrl *controllers.InvitationController,
 	responseCtrl *controllers.ResponseController,
 	giftCtrl *controllers.GiftController,
+	userCtrl *controllers.UserController,
 ) http.Handler {
 	r := chi.NewRouter()
 
 	// ── Global middleware ────────────────────────────────────────────────────────
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{"http://localhost:*", "https://localhost:*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
+		AllowCredentials: true,
+	}))
 	r.Use(middleware.Logger)    // log every request with method, path, status, latency
 	r.Use(middleware.Recoverer) // recover from panics and return 500 instead of crashing
 
@@ -74,6 +82,11 @@ func New(
 			r.Get("/{id}", giftCtrl.GetByID)
 			r.Put("/{id}", giftCtrl.Update)
 			r.Delete("/{id}", giftCtrl.Delete)
+		})
+
+		r.Route("/users", func(r chi.Router) {
+			r.Post("/login", userCtrl.Login)
+			r.Post("/hash", userCtrl.HashPassword) // for testing, not exposed in production
 		})
 	})
 
