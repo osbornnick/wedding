@@ -12,13 +12,13 @@ import (
 )
 
 // New creates and returns a fully configured chi.Mux.
-// Each entity gets a sub-router at /api/v1/<resource> with standard CRUD routes:
+// Each entity gets a sub-router at /api/<resource> with standard CRUD routes:
 //
-//	GET    /api/v1/<resource>      → list all
-//	POST   /api/v1/<resource>      → create
-//	GET    /api/v1/<resource>/{id} → get one
-//	PUT    /api/v1/<resource>/{id} → replace one
-//	DELETE /api/v1/<resource>/{id} → delete one
+//	GET    /api/<resource>      → list all
+//	POST   /api/<resource>      → create
+//	GET    /api/<resource>/{id} → get one
+//	PUT    /api/<resource>/{id} → replace one
+//	DELETE /api/<resource>/{id} → delete one
 func New(
 	guestCtrl *controllers.GuestController,
 	invitationCtrl *controllers.InvitationController,
@@ -45,7 +45,7 @@ func New(
 	})
 
 	// ── API routes ───────────────────────────────────────────────────────────────
-	r.Route("/api/v1", func(r chi.Router) {
+	r.Route("/api", func(r chi.Router) {
 
 		// Guests
 		r.Route("/guests", func(r chi.Router) {
@@ -86,7 +86,7 @@ func New(
 
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/login", userCtrl.Login)
-			r.Post("/hash", userCtrl.HashPassword) // for testing, not exposed in production
+			r.Post("/hash", userCtrl.HashPassword)
 		})
 	})
 

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import Schedule from '../../components/Schedule'
 import Travel from '../../components/Travel'
 import RSVP from '../../components/RSVP'
+import PhotoCarousel from '../../components/PhotoCarousel'
 
 export const Route = createFileRoute('/_authenticated/')({ component: Home })
 
@@ -49,13 +50,7 @@ function Home() {
   return (
     <main>
       {/* Banner */}
-      <div className="flex justify-center px-4 py-4">
-        <img
-          src="/images/banner_photo.jpg"
-          alt="Nicky and Sarah"
-          className="max-h-[32rem] w-auto max-w-full rounded-xl object-contain sm:max-h-[40rem]"
-        />
-      </div>
+      <PhotoCarousel />
 
       {/* Date & Countdown */}
       <div className="border-b border-stone-100 bg-white px-4 py-8 text-center">
