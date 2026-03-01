@@ -50,7 +50,9 @@ function Home() {
   return (
     <main>
       {/* Banner */}
-      <PhotoCarousel />
+      <div className="mx-auto max-w-5xl">
+        <PhotoCarousel />
+      </div>
 
       {/* Date & Countdown */}
       <div className="border-b border-stone-100 bg-white px-4 py-8 text-center">
