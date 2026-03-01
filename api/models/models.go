@@ -59,3 +59,16 @@ type Gift struct {
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
+
+// ── Purchase ──────────────────────────────────────────────────────────────────
+
+// Purchase records a guest's contribution or purchase of a gift
+// (schema: purchases table).
+type Purchase struct {
+	ID        int        `json:"id"`
+	GiftID    int        `json:"gift_id"`
+	GuestID   int        `json:"guest_id"`
+	Amount    *float64   `json:"amount"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+}
