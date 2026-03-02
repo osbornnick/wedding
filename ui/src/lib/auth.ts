@@ -10,7 +10,7 @@ export function isAuthenticated(): boolean {
 }
 
 export async function login(password: string): Promise<boolean> {
-  const response = await fetch('http://localhost:8081/api/v1/users/login', {
+  const response = await fetch('http://localhost:8081/api/users/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

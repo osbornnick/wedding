@@ -17,7 +17,7 @@ export default function PhotoCarousel() {
         <CarouselItem
           src="/images/babies.jpg"
           alt="young Nicky and Sarah"
-          description="Mar 23, 2019, young Nicky and Sarah at the 'Snow Ball' dance at Bates. Nicky was a senior soon to graduate, and Sarah a sophomore. Truly so baby."
+          description="Mar 23, 2019, young Nicky and Sarah at the 'Gala' dance at Bates. Nicky was a senior soon to graduate, and Sarah a sophomore. Truly so baby."
         />
         <CarouselItem
           src="/images/copenhagen.jpg"

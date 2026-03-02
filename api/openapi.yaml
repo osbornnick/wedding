@@ -4,7 +4,7 @@ info:
     title: Wedding API
     description: >
         REST API for managing wedding guests, invitations, RSVP responses, and the
-        gift registry.  All resources live under `/api/v1`.
+        gift registry.  All resources live under `/api`.
     version: 1.0.0
 
 servers:
@@ -23,6 +23,8 @@ tags:
       description: RSVP responses
     - name: gifts
       description: Gift registry items
+    - name: users
+      description: Authentication and user utilities
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 paths:
@@ -48,7 +50,7 @@ paths:
 
     # ── Guests ─────────────────────────────────────────────────────────────────
 
-    /api/v1/guests/:
+    /api/guests:
         get:
             tags: [guests]
             summary: List all guests
@@ -87,7 +89,34 @@ paths:
                 "500":
                     $ref: "#/components/responses/InternalServerError"
 
-    /api/v1/guests/{id}:
+    /api/guests/search:
+        get:
+            tags: [guests]
+            summary: Fuzzy search guests by name
+            operationId: searchGuests
+            parameters:
+                - name: name
+                  in: query
+                  required: true
+                  description: Name fragment to fuzzy-match against guest names
+                  schema:
+                      type: string
+                  example: Jane
+            responses:
+                "200":
+                    description: Array of matching guest records
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Guest"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    /api/guests/{id}:
         parameters:
             - $ref: "#/components/parameters/IdParam"
 
@@ -149,7 +178,7 @@ paths:
 
     # ── Invitations ────────────────────────────────────────────────────────────
 
-    /api/v1/invitations/:
+    /api/invitations:
         get:
             tags: [invitations]
             summary: List all invitations
@@ -188,7 +217,7 @@ paths:
                 "500":
                     $ref: "#/components/responses/InternalServerError"
 
-    /api/v1/invitations/{id}:
+    /api/invitations/{id}:
         parameters:
             - $ref: "#/components/parameters/IdParam"
 
@@ -250,7 +279,7 @@ paths:
 
     # ── Responses (RSVP) ───────────────────────────────────────────────────────
 
-    /api/v1/responses/:
+    /api/responses:
         get:
             tags: [responses]
             summary: List all RSVP responses
@@ -289,7 +318,7 @@ paths:
                 "500":
                     $ref: "#/components/responses/InternalServerError"
 
-    /api/v1/responses/{id}:
+    /api/responses/{id}:
         parameters:
             - $ref: "#/components/parameters/IdParam"
 
@@ -351,7 +380,7 @@ paths:
 
     # ── Gifts ──────────────────────────────────────────────────────────────────
 
-    /api/v1/gifts/:
+    /api/gifts:
         get:
             tags: [gifts]
             summary: List all gift registry items
@@ -390,7 +419,7 @@ paths:
                 "500":
                     $ref: "#/components/responses/InternalServerError"
 
-    /api/v1/gifts/{id}:
+    /api/gifts/{id}:
         parameters:
             - $ref: "#/components/parameters/IdParam"
 
@@ -450,6 +479,52 @@ paths:
                 "500":
                     $ref: "#/components/responses/InternalServerError"
 
+    # ── Users ──────────────────────────────────────────────────────────────────
+
+    /api/users/login:
+        post:
+            tags: [users]
+            summary: Authenticate a user
+            operationId: loginUser
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/LoginRequest"
+            responses:
+                "200":
+                    description: Authentication successful
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "401":
+                    $ref: "#/components/responses/Unauthorized"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    /api/users/hash:
+        post:
+            tags: [users]
+            summary: Hash a plain-text password
+            operationId: hashPassword
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/HashRequest"
+            responses:
+                "200":
+                    description: Bcrypt hash of the supplied password
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/HashResponse"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
 # ── Components ────────────────────────────────────────────────────────────────
 components:
     # ── Reusable parameters ───────────────────────────────────────────────────
@@ -480,6 +555,13 @@ components:
                     schema:
                         $ref: "#/components/schemas/Error"
 
+        Unauthorized:
+            description: Authentication credentials are invalid
+            content:
+                application/json:
+                    schema:
+                        $ref: "#/components/schemas/Error"
+
         InternalServerError:
             description: An unexpected server-side error occurred
             content:
@@ -501,28 +583,40 @@ components:
 
         # ── Guest ────────────────────────────────────────────────────────────────
         Guest:
-            description: Fields required to create or replace a guest
+            type: object
+            description: A wedding guest record
             properties:
-                name:
-                    type: string
-                    description: Full name of the guest
-                    example: Jane Smith
-                invitation_id:
-                    type: string
-                    description: ID of the invitation this guest belongs to
-                    example: "42"
                 id:
                     type: integer
                     description: Auto-generated primary key
                     example: 1
                     readOnly: true
+                name:
+                    type: string
+                    description: Full name of the guest
+                    example: Jane Smith
+                invitation_id:
+                    type: integer
+                    description: ID of the invitation this guest belongs to
+                    example: 42
+                aliases:
+                    type: array
+                    description: Alternative names used during fuzzy search
+                    items:
+                        type: string
+                    example: ["Jane", "Janie"]
+                    readOnly: true
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the record was created
+                    readOnly: true
             required: [name]
 
         # ── Invitation ───────────────────────────────────────────────────────────
-
         Invitation:
             type: object
-            description: Fields required to create or replace an invitation
+            description: A mailed invitation sent to a household
             properties:
                 id:
                     type: integer
@@ -538,60 +632,68 @@ components:
                     description: Number of guests included on this invitation
                     example: 2
                     minimum: 1
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the record was created
+                    readOnly: true
             required: [address, num_guests]
 
         # ── Response (RSVP) ──────────────────────────────────────────────────────
-
         Response:
             type: object
-            description: Fields required to create or replace an RSVP response
+            description: An RSVP response from an invitation recipient
             properties:
                 id:
                     type: integer
                     description: Auto-generated primary key
                     example: 1
                     readOnly: true
-            attending_wedding:
-                type: boolean
-                description: Whether the party is attending the wedding ceremony
-                default: false
-            attending_wedding_count:
-                type: integer
-                description: Number of people attending the wedding ceremony
-                default: 0
-                minimum: 0
-            attending_friday:
-                type: boolean
-                description: Whether the party is attending the Friday event
-                default: false
-            attending_friday_count:
-                type: integer
-                description: Number of people attending the Friday event
-                default: 0
-                minimum: 0
-            attending_brunch:
-                type: boolean
-                description: Whether the party is attending the post-wedding brunch
-                default: false
-            attending_brunch_count:
-                type: integer
-                description: Number of people attending the brunch
-                default: 0
-                minimum: 0
-            dietary_restrictions:
-                type: string
-                description: Free-text dietary restrictions or allergies
-                example: Vegetarian, nut allergy
-            invitation_id:
-                type: string
-                description: ID of the invitation this RSVP belongs to
-                example: "42"
+                attending_wedding:
+                    type: boolean
+                    description: Whether the party is attending the wedding ceremony
+                    default: false
+                attending_wedding_count:
+                    type: integer
+                    description: Number of people attending the wedding ceremony
+                    default: 0
+                    minimum: 0
+                attending_friday:
+                    type: boolean
+                    description: Whether the party is attending the Friday event
+                    default: false
+                attending_friday_count:
+                    type: integer
+                    description: Number of people attending the Friday event
+                    default: 0
+                    minimum: 0
+                attending_brunch:
+                    type: boolean
+                    description: Whether the party is attending the post-wedding brunch
+                    default: false
+                attending_brunch_count:
+                    type: integer
+                    description: Number of people attending the brunch
+                    default: 0
+                    minimum: 0
+                dietary_restrictions:
+                    type: string
+                    description: Free-text dietary restrictions or allergies
+                    example: Vegetarian, nut allergy
+                invitation_id:
+                    type: integer
+                    description: ID of the invitation this RSVP belongs to
+                    example: 42
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the record was created
+                    readOnly: true
 
         # ── Gift ─────────────────────────────────────────────────────────────────
-
         Gift:
             type: object
-            description: Fields required to create or replace a gift registry item
+            description: A gift registry item
             properties:
                 id:
                     type: integer
@@ -632,4 +734,45 @@ components:
                     type: string
                     description: Optional description of the gift
                     example: 5-quart tilt-head stand mixer in Empire Red
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the record was created
+                    readOnly: true
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the record was last updated
+                    readOnly: true
             required: [name]
+
+        # ── User utilities ────────────────────────────────────────────────────────
+        LoginRequest:
+            type: object
+            properties:
+                username:
+                    type: string
+                    example: admin
+                password:
+                    type: string
+                    format: password
+                    example: s3cr3t
+            required: [username, password]
+
+        HashRequest:
+            type: object
+            properties:
+                password:
+                    type: string
+                    format: password
+                    example: s3cr3t
+            required: [password]
+
+        HashResponse:
+            type: object
+            properties:
+                hashed_password:
+                    type: string
+                    description: Bcrypt hash of the supplied password
+                    example: "$2a$10$..."
+                    readOnly: true
