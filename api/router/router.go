@@ -25,6 +25,7 @@ func New(
 	responseCtrl *controllers.ResponseController,
 	giftCtrl *controllers.GiftController,
 	userCtrl *controllers.UserController,
+	purchaseCtrl *controllers.PurchaseController,
 ) http.Handler {
 	r := chi.NewRouter()
 
@@ -87,6 +88,15 @@ func New(
 		r.Route("/users", func(r chi.Router) {
 			r.Post("/login", userCtrl.Login)
 			r.Post("/hash", userCtrl.HashPassword)
+		})
+
+		// Purchases
+		r.Route("/purchases", func(r chi.Router) {
+			r.Get("/", purchaseCtrl.GetAll)
+			r.Post("/", purchaseCtrl.Create)
+			r.Get("/{id}", purchaseCtrl.GetByID)
+			r.Put("/{id}", purchaseCtrl.Update)
+			r.Delete("/{id}", purchaseCtrl.Delete)
 		})
 	})
 

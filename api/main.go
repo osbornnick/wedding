@@ -41,6 +41,7 @@ func main() {
 	responseSvc := services.NewResponseService(database)
 	giftSvc := services.NewGiftService(database)
 	userSvc := services.NewUserService(database)
+	purchaseSvc := services.NewPurchaseService(database)
 
 	// ── Controllers ─────────────────────────────────────────────────────────────
 	// Controllers parse HTTP requests, delegate to services, and write responses.
@@ -49,9 +50,10 @@ func main() {
 	responseCtrl := controllers.NewResponseController(responseSvc)
 	giftCtrl := controllers.NewGiftController(giftSvc)
 	userCtrl := controllers.NewUserController(userSvc)
+	purchaseCtrl := controllers.NewPurchaseController(purchaseSvc)
 
 	// ── Router ──────────────────────────────────────────────────────────────────
-	r := router.New(guestCtrl, invitationCtrl, responseCtrl, giftCtrl, userCtrl)
+	r := router.New(guestCtrl, invitationCtrl, responseCtrl, giftCtrl, userCtrl, purchaseCtrl)
 
 	addr := ":" + getEnv("PORT", "8080")
 	log.Printf("wedding backend listening on %s", addr)
