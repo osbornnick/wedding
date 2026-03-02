@@ -23,6 +23,8 @@ tags:
       description: RSVP responses
     - name: gifts
       description: Gift registry items
+    - name: purchases
+      description: Gift purchase contributions
     - name: users
       description: Authentication and user utilities
 
@@ -479,6 +481,107 @@ paths:
                 "500":
                     $ref: "#/components/responses/InternalServerError"
 
+    # ── Purchases ──────────────────────────────────────────────────────────────
+
+    /api/purchases:
+        get:
+            tags: [purchases]
+            summary: List all purchases
+            operationId: listPurchases
+            responses:
+                "200":
+                    description: Array of purchase records
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: "#/components/schemas/Purchase"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        post:
+            tags: [purchases]
+            summary: Create a purchase
+            operationId: createPurchase
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Purchase"
+            responses:
+                "201":
+                    description: Purchase created
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Purchase"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+    /api/purchases/{id}:
+        parameters:
+            - $ref: "#/components/parameters/IdParam"
+
+        get:
+            tags: [purchases]
+            summary: Get a purchase by ID
+            operationId: getPurchase
+            responses:
+                "200":
+                    description: Purchase record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Purchase"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        put:
+            tags: [purchases]
+            summary: Replace a purchase
+            operationId: updatePurchase
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: "#/components/schemas/Purchase"
+            responses:
+                "200":
+                    description: Updated purchase record
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/Purchase"
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
+        delete:
+            tags: [purchases]
+            summary: Delete a purchase
+            operationId: deletePurchase
+            responses:
+                "204":
+                    description: Purchase deleted
+                "400":
+                    $ref: "#/components/responses/BadRequest"
+                "404":
+                    $ref: "#/components/responses/NotFound"
+                "500":
+                    $ref: "#/components/responses/InternalServerError"
+
     # ── Users ──────────────────────────────────────────────────────────────────
 
     /api/users/login:
@@ -712,24 +815,6 @@ components:
                     type: string
                     description: URL to purchase the gift
                     example: https://example.com/products/mixer
-                progress:
-                    type: number
-                    format: double
-                    description: Amount already contributed toward this gift
-                    default: 0.00
-                    minimum: 0
-                    example: 50.00
-                total:
-                    type: number
-                    format: double
-                    description: Total cost of the gift
-                    default: 0.00
-                    minimum: 0
-                    example: 349.99
-                purchased:
-                    type: boolean
-                    description: Whether the gift has been fully purchased
-                    default: false
                 description:
                     type: string
                     description: Optional description of the gift
@@ -745,6 +830,43 @@ components:
                     description: Timestamp when the record was last updated
                     readOnly: true
             required: [name]
+
+        # ── Purchase ─────────────────────────────────────────────────────────────
+        Purchase:
+            type: object
+            description: A guest's contribution or purchase of a gift registry item
+            properties:
+                id:
+                    type: integer
+                    description: Auto-generated primary key
+                    example: 1
+                    readOnly: true
+                gift_id:
+                    type: integer
+                    description: ID of the gift being purchased
+                    example: 5
+                guest_id:
+                    type: integer
+                    description: ID of the guest making the purchase
+                    example: 12
+                amount:
+                    type: number
+                    format: double
+                    description: Monetary contribution toward the gift (null means full purchase)
+                    minimum: 0
+                    example: 50.00
+                    nullable: true
+                created_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the record was created
+                    readOnly: true
+                updated_at:
+                    type: string
+                    format: date-time
+                    description: Timestamp when the record was last updated
+                    readOnly: true
+            required: [gift_id, guest_id]
 
         # ── User utilities ────────────────────────────────────────────────────────
         LoginRequest:

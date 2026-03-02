@@ -24,7 +24,7 @@ func NewGiftService(db *pgxpool.Pool) *GiftService {
 // GetAll returns every gift record from the database.
 func (s *GiftService) GetAll() ([]models.Gift, error) {
 	rows, err := s.db.Query(context.Background(), `
-		SELECT id, img, name, link, progress, total, purchased, description
+		SELECT id, img, name, link, description
 		FROM gifts ORDER BY id`)
 	if err != nil {
 		return nil, fmt.Errorf("GiftService.GetAll query: %w", err)
@@ -36,7 +36,7 @@ func (s *GiftService) GetAll() ([]models.Gift, error) {
 		var g models.Gift
 		if err := rows.Scan(
 			&g.ID, &g.Img, &g.Name, &g.Link,
-			&g.Progress, &g.Total, &g.Purchased, &g.Description,
+			&g.Description,
 		); err != nil {
 			return nil, fmt.Errorf("GiftService.GetAll scan: %w", err)
 		}
@@ -49,11 +49,11 @@ func (s *GiftService) GetAll() ([]models.Gift, error) {
 func (s *GiftService) GetByID(id int) (*models.Gift, error) {
 	var g models.Gift
 	err := s.db.QueryRow(context.Background(), `
-		SELECT id, img, name, link, progress, total, purchased, description
+		SELECT id, img, name, link, description
 		FROM gifts WHERE id = $1`, id,
 	).Scan(
 		&g.ID, &g.Img, &g.Name, &g.Link,
-		&g.Progress, &g.Total, &g.Purchased, &g.Description,
+		&g.Description,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("GiftService.GetByID: %w", err)
@@ -64,9 +64,9 @@ func (s *GiftService) GetByID(id int) (*models.Gift, error) {
 // Create inserts a new gift and returns the record with its generated id.
 func (s *GiftService) Create(g *models.Gift) (*models.Gift, error) {
 	err := s.db.QueryRow(context.Background(), `
-		INSERT INTO gifts (img, name, link, progress, total, purchased, description)
-		VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id`,
-		g.Img, g.Name, g.Link, g.Progress, g.Total, g.Purchased, g.Description,
+		INSERT INTO gifts (img, name, link, description)
+		VALUES ($1,$2,$3,$4) RETURNING id`,
+		g.Img, g.Name, g.Link, g.Description,
 	).Scan(&g.ID)
 	if err != nil {
 		return nil, fmt.Errorf("GiftService.Create: %w", err)
@@ -81,12 +81,9 @@ func (s *GiftService) Update(id int, g *models.Gift) (*models.Gift, error) {
 			img         = $1,
 			name        = $2,
 			link        = $3,
-			progress    = $4,
-			total       = $5,
-			purchased   = $6,
-			description = $7
-		WHERE id = $8`,
-		g.Img, g.Name, g.Link, g.Progress, g.Total, g.Purchased, g.Description, id,
+			description = $4
+		WHERE id = $5`,
+		g.Img, g.Name, g.Link, g.Description, id,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("GiftService.Update: %w", err)

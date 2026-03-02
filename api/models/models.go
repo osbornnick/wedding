@@ -52,9 +52,6 @@ type Gift struct {
 	Img         string    `json:"img"`
 	Name        string    `json:"name"`
 	Link        string    `json:"link"`
-	Progress    float64   `json:"progress"`
-	Total       float64   `json:"total"`
-	Purchased   bool      `json:"purchased"`
 	Description string    `json:"description"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
