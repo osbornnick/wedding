@@ -1,5 +1,13 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { DarkThemeToggle, Button } from 'flowbite-react'
+import {
+  DarkThemeToggle,
+  Button,
+  Navbar,
+  NavbarBrand,
+  NavbarCollapse,
+  NavbarToggle,
+  NavbarLink,
+} from 'flowbite-react'
 
 const navLinks = [
   { to: '/', label: 'Home', exact: true },
@@ -17,33 +25,28 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-stone-200 bg-white/90 px-4 backdrop-blur-md shadow-sm">
-      <nav className="mx-auto flex max-w-5xl items-center justify-between py-4">
-        <Link
-          to="/"
-          className="font-serif text-xl font-semibold tracking-wide text-stone-800 no-underline"
-        >
-          Nicky &amp; Sarah
-        </Link>
-
-        <div className="flex items-center gap-6 text-sm font-medium">
+    <header className="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-700">
+      <Navbar fluid className="max-w-6xl mx-auto">
+        <NavbarBrand as={Link} href="/">
+          <span className="font-serif text-xl text-gray-700 hover:bg-gray-50 md:border-0 md:hover:bg-transparent md:hover:text-primary-700 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent md:dark:hover:text-white">
+            Nicky &amp; Sarah
+          </span>
+        </NavbarBrand>
+        <NavbarToggle />
+        <NavbarCollapse>
           {navLinks.map(({ to, label, exact }) => (
-            <Link
-              key={to}
-              to={to}
-              className="text-stone-500 transition hover:text-stone-900"
-              activeProps={{ className: 'text-stone-900 font-semibold' }}
-              activeOptions={exact ? { exact: true } : undefined}
-            >
+            <NavbarLink key={to} href={to}>
               {label}
-            </Link>
+            </NavbarLink>
           ))}
+        </NavbarCollapse>
+        <div className="flex">
           {import.meta.env.DEV && (
             <Button onClick={handleLogout}>Dev: Logout</Button>
           )}
           <DarkThemeToggle />
         </div>
-      </nav>
+      </Navbar>
     </header>
   )
 }

@@ -1,8 +1,14 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { loginFn } from '../lib/auth'
+import { Button, Card, HelperText, TextInput } from 'flowbite-react'
 
 export const Route = createFileRoute('/login')({
+  beforeLoad: async ({ context }) => {
+    if (context.isAuthenticated) {
+      throw redirect({ to: '/' })
+    }
+  },
   component: LoginPage,
 })
 
@@ -22,15 +28,18 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50">
-      <div className="bg-white rounded-2xl shadow-lg p-10 w-full max-w-sm text-center">
-        <h1 className="font-serif text-3xl text-stone-800 mb-2">
-          Nicky & Sarah
-        </h1>
-        <p className="text-stone-500 text-sm mb-8">May 15, 2027</p>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
+    <div className="grow flex items-center justify-center">
+      <Card
+        className="max-w-sm"
+        imgSrc="/images/engagement.jpg"
+        imgAlt="Engagement photo"
+      >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 p-2">
+          <div className="text-center">
+            <h1 className="font-serif text-3xl mb-2">Nicky & Sarah</h1>
+            <p className="text-sm mb-8">May 15, 2027</p>
+          </div>
+          <TextInput
             type="password"
             placeholder="Enter password"
             value={password}
@@ -38,23 +47,16 @@ function LoginPage() {
               setPassword(e.target.value)
               setError(false)
             }}
-            className={`w-full border rounded-lg px-4 py-2 text-stone-800 outline-none focus:ring-2 focus:ring-stone-400 ${
-              error ? 'border-red-400' : 'border-stone-300'
-            }`}
+            color={error ? 'failure' : undefined}
           />
-          {error && (
-            <p className="text-red-500 text-sm">
-              Incorrect password, please try again.
-            </p>
-          )}
-          <button
-            type="submit"
-            className="w-full bg-stone-800 text-white rounded-lg py-2 hover:bg-stone-700 transition"
-          >
+          <HelperText className="font-medium" hidden={!error}>
+            Incorrect password, please try again.
+          </HelperText>
+          <Button type="submit" className="w-full py-2 transition">
             Enter
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   )
 }

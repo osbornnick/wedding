@@ -1,9 +1,16 @@
 import { Carousel } from 'flowbite-react'
 
+const carouselTheme = {
+  control: {
+    base: 'inline-flex h-10 w-10 items-center justify-center rounded-full bg-stone-800/60 group-hover:bg-stone-800/80 dark:bg-white/20 dark:group-hover:bg-white/40 sm:h-12 sm:w-12',
+    icon: 'h-5 w-5 text-white dark:text-white sm:h-6 sm:w-6',
+  },
+}
+
 export default function PhotoCarousel() {
   return (
     <div className="h-200 m-5">
-      <Carousel className="w-full" indicators={false}>
+      <Carousel className="w-full" indicators={false} theme={carouselTheme}>
         <CarouselItem
           src="/images/engagement.jpg"
           alt="Nicky and Sarah"
@@ -51,7 +58,9 @@ function CarouselItem({
   return (
     <div className="h-full flex flex-col items-center justify-center overflow-hidden">
       <img src={src} alt={alt} className="min-h-0 object-contain rounded-xl" />
-      <p className="mt-2 text-center text-sm text-stone-500">{description}</p>
+      <p className="mt-2 text-center text-sm text-stone-500 dark:text-stone-300">
+        {description}
+      </p>
     </div>
   )
 }

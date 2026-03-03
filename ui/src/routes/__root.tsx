@@ -6,6 +6,7 @@ import Footer from '../components/Footer'
 import Header from '../components/Header'
 import appCss from '../styles.css?url'
 import { useAppSession } from '#/lib/session'
+import { ThemeModeScript } from 'flowbite-react'
 
 const getSessionFn = createServerFn().handler(async () => {
   const session = await useAppSession()
@@ -45,8 +46,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <ThemeModeScript />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere]">
+      <body className="font-sans antialiased [overflow-wrap:anywhere] dark:bg-gray-800 flex flex-col min-h-screen">
         <Header />
         {children}
         <Footer />
