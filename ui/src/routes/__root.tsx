@@ -1,11 +1,22 @@
 import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
+import { createServerFn } from '@tanstack/react-start'
 import Footer from '../components/Footer'
 import Header from '../components/Header'
 import appCss from '../styles.css?url'
+import { useAppSession } from '#/lib/session'
+
+const getSessionFn = createServerFn().handler(async () => {
+  const session = await useAppSession()
+  return session.data
+})
 
 export const Route = createRootRoute({
+  beforeLoad: async () => {
+    const session = await getSessionFn()
+    return session
+  },
   head: () => ({
     meta: [
       {

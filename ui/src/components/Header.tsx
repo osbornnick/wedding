@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { logout } from '../lib/auth'
+import { DarkThemeToggle, Button } from 'flowbite-react'
 
 const navLinks = [
   { to: '/', label: 'Home', exact: true },
@@ -12,9 +12,8 @@ const navLinks = [
 export default function Header() {
   const navigate = useNavigate()
 
-  function handleLogout() {
-    logout()
-    navigate({ to: '/login' })
+  async function handleLogout() {
+    navigate({ to: '/logout' })
   }
 
   return (
@@ -40,13 +39,9 @@ export default function Header() {
             </Link>
           ))}
           {import.meta.env.DEV && (
-            <button
-              onClick={handleLogout}
-              className="rounded-md bg-stone-100 px-3 py-1 text-xs text-stone-500 transition hover:bg-stone-200 hover:text-stone-800"
-            >
-              Dev: Logout
-            </button>
+            <Button onClick={handleLogout}>Dev: Logout</Button>
           )}
+          <DarkThemeToggle />
         </div>
       </nav>
     </header>

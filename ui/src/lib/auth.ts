@@ -1,15 +1,26 @@
-const AUTH_KEY = 'wedding_auth'
+import { createServerFn } from '@tanstack/react-start'
+import { useAppSession } from './session'
+import { redirect } from '@tanstack/react-router'
+import { getRequestHeader, getRequestIP } from '@tanstack/react-start/server'
 
-function isBrowser(): boolean {
-  return typeof window !== 'undefined'
-}
+export const loginFn = createServerFn({ method: 'POST' })
+  .inputValidator((data: { password: string }) => data)
+  .handler(async ({ data }) => {
+    const success = await login(data.password)
+    if (success) {
+      const session = await useAppSession()
+      await session.update({
+        user: {
+          ip: getRequestIP() || 'unknown',
+          x_forwarded_for: getRequestIP({ xForwardedFor: true }),
+        },
+        isAuthenticated: true,
+      })
+    }
+    return success
+  })
 
-export function isAuthenticated(): boolean {
-  if (!isBrowser()) return false
-  return localStorage.getItem(AUTH_KEY) === 'true'
-}
-
-export async function login(password: string): Promise<boolean> {
+async function login(password: string): Promise<boolean> {
   const response = await fetch('http://localhost:8081/api/users/login', {
     method: 'POST',
     headers: {
@@ -19,15 +30,13 @@ export async function login(password: string): Promise<boolean> {
   })
   console.log(response)
   if (response.ok) {
-    if (isBrowser()) {
-      localStorage.setItem(AUTH_KEY, 'true')
-    }
     return true
   }
   return false
 }
 
-export function logout(): void {
-  if (!isBrowser()) return
-  localStorage.removeItem(AUTH_KEY)
-}
+export const logoutFn = createServerFn({ method: 'POST' }).handler(async () => {
+  const session = await useAppSession()
+  await session.clear()
+  throw redirect({ to: '/login' })
+})
