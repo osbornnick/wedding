@@ -31,9 +31,9 @@ func New(
 
 	// ── Global middleware ────────────────────────────────────────────────────────
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{"http://localhost:*", "https://localhost:*"},
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"Accept", "Authorization", "Content-Type"},
+		AllowedOrigins:   []string{"http://localhost:*", "https://localhost:*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true,
 	}))
 	r.Use(middleware.Logger)    // log every request with method, path, status, latency
@@ -50,7 +50,6 @@ func New(
 
 		// Guests
 		r.Route("/guests", func(r chi.Router) {
-			r.Get("/search", guestCtrl.FuzzySearchByName)
 			r.Get("/", guestCtrl.GetAll)
 			r.Post("/", guestCtrl.Create)
 			r.Get("/{id}", guestCtrl.GetByID)

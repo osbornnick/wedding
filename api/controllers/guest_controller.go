@@ -24,7 +24,14 @@ func NewGuestController(svc *services.GuestService) *GuestController {
 
 // GetAll handles GET /guests — returns all guests as a JSON array.
 func (c *GuestController) GetAll(w http.ResponseWriter, r *http.Request) {
-	guests, err := c.svc.GetAll()
+	name := r.URL.Query().Get("name")
+	var guests []models.Guest
+	var err error
+	if name == "" {
+		guests, err = c.svc.GetAll()
+	} else {
+		guests, err = c.svc.FuzzySearchByName(name)
+	}
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
@@ -107,18 +114,4 @@ func (c *GuestController) Delete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func (c *GuestController) FuzzySearchByName(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
-	if name == "" {
-		writeError(w, http.StatusBadRequest, "name query parameter is required")
-		return
-	}
-	results, err := c.svc.FuzzySearchByName(name)
-	if err != nil {
-		writeError(w, http.StatusInternalServerError, err.Error())
-		return
-	}
-	writeJSON(w, http.StatusOK, results)
 }
