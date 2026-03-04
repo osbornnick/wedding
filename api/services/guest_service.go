@@ -99,19 +99,39 @@ func (s *GuestService) Delete(id int) error {
 	return nil
 }
 
-func (s *GuestService) FuzzySearchByName(name string) ([]models.Guest, error) {
-	all, err := s.GetAll()
+// GetByInvitationID returns all guests with the given invitation_id.
+func (s *GuestService) GetByInvitationID(invitationID int) ([]models.Guest, error) {
+	rows, err := s.db.Query(
+		context.Background(),
+		`SELECT id, name, invitation_id, aliases, created_at FROM guests WHERE invitation_id = $1 ORDER BY id`,
+		invitationID,
+	)
 	if err != nil {
-		return nil, fmt.Errorf("GuestService.FuzzySearchByName: %w", err)
+		return nil, fmt.Errorf("GuestService.GetByInvitationID query: %w", err)
 	}
+	defer rows.Close()
+
+	var guests []models.Guest
+	for rows.Next() {
+		var g models.Guest
+		if err := rows.Scan(&g.ID, &g.Name, &g.InvitationID, &g.Aliases, &g.CreatedAt); err != nil {
+			return nil, fmt.Errorf("GuestService.GetByInvitationID scan: %w", err)
+		}
+		guests = append(guests, g)
+	}
+	return guests, rows.Err()
+}
+
+// fuzzyFilter applies fuzzy name matching against a slice of guests.
+func fuzzyFilter(name string, guests []models.Guest) []models.Guest {
 	words := []string{}
 	guestMap := map[string]*models.Guest{}
-	for _, g := range all {
+	for i, g := range guests {
 		words = append(words, g.Name)
-		guestMap[g.Name] = &g
+		guestMap[g.Name] = &guests[i]
 		for _, a := range g.Aliases {
 			words = append(words, a)
-			guestMap[a] = &g
+			guestMap[a] = &guests[i]
 		}
 	}
 	matches := fuzzy.RankFindNormalizedFold(name, words)
@@ -122,5 +142,22 @@ func (s *GuestService) FuzzySearchByName(name string) ([]models.Guest, error) {
 			results = append(results, *g)
 		}
 	}
-	return results, nil
+	return results
+}
+
+func (s *GuestService) FuzzySearchByName(name string) ([]models.Guest, error) {
+	all, err := s.GetAll()
+	if err != nil {
+		return nil, fmt.Errorf("GuestService.FuzzySearchByName: %w", err)
+	}
+	return fuzzyFilter(name, all), nil
+}
+
+// FuzzySearchByNameAndInvitationID returns fuzzy-matched guests filtered to a specific invitation.
+func (s *GuestService) FuzzySearchByNameAndInvitationID(name string, invitationID int) ([]models.Guest, error) {
+	filtered, err := s.GetByInvitationID(invitationID)
+	if err != nil {
+		return nil, fmt.Errorf("GuestService.FuzzySearchByNameAndInvitationID: %w", err)
+	}
+	return fuzzyFilter(name, filtered), nil
 }

@@ -22,9 +22,42 @@ func NewGuestController(svc *services.GuestService) *GuestController {
 	return &GuestController{svc: svc}
 }
 
-// GetAll handles GET /guests — returns all guests as a JSON array.
+// GetAll handles GET /guests — returns guests as a JSON array.
+// Supports optional query parameters:
+//   - invitationId: filter guests by invitation id
+//   - name: fuzzy-search guests by name (or alias)
+//
+// Both parameters may be combined to narrow results further.
 func (c *GuestController) GetAll(w http.ResponseWriter, r *http.Request) {
-	guests, err := c.svc.GetAll()
+	name := r.URL.Query().Get("name")
+	invitationIDStr := r.URL.Query().Get("invitationId")
+
+	var invitationID int
+	if invitationIDStr != "" {
+		var parseErr error
+		invitationID, parseErr = strconv.Atoi(invitationIDStr)
+		if parseErr != nil {
+			writeError(w, http.StatusBadRequest, "invitationId must be an integer")
+			return
+		}
+	}
+
+	var (
+		guests []models.Guest
+		err    error
+	)
+
+	switch {
+	case name != "" && invitationIDStr != "":
+		guests, err = c.svc.FuzzySearchByNameAndInvitationID(name, invitationID)
+	case invitationIDStr != "":
+		guests, err = c.svc.GetByInvitationID(invitationID)
+	case name != "":
+		guests, err = c.svc.FuzzySearchByName(name)
+	default:
+		guests, err = c.svc.GetAll()
+	}
+
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return
