@@ -9,7 +9,7 @@ const carouselTheme = {
 
 export default function PhotoCarousel() {
   return (
-    <div className="h-200 m-5">
+    <div className="m-5 h-[75vh] max-h-[480px]">
       <Carousel className="w-full" indicators={false} theme={carouselTheme}>
         <CarouselItem
           src="/images/engagement.jpg"
