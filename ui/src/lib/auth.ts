@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start'
 import { useAppSession } from './session'
 import { redirect } from '@tanstack/react-router'
-import { getRequestHeader, getRequestIP } from '@tanstack/react-start/server'
+import { getRequestIP } from '@tanstack/react-start/server'
 
 export const loginFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { password: string }) => data)
