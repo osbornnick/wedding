@@ -4,6 +4,7 @@ export interface User {
   ip: string
   x_forwarded_for?: string
   name?: string
+  hasRSVPed?: boolean
 }
 
 export interface AuthState {

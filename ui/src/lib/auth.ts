@@ -2,6 +2,7 @@ import { createServerFn } from '@tanstack/react-start'
 import { useAppSession } from './session'
 import { redirect } from '@tanstack/react-router'
 import { getRequestIP } from '@tanstack/react-start/server'
+import { API_HOST } from './constants'
 
 export const loginFn = createServerFn({ method: 'POST' })
   .inputValidator((data: { password: string }) => data)
@@ -21,7 +22,7 @@ export const loginFn = createServerFn({ method: 'POST' })
   })
 
 async function login(password: string): Promise<boolean> {
-  const response = await fetch('http://localhost:8081/api/users/login', {
+  const response = await fetch(`${API_HOST}/api/users/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

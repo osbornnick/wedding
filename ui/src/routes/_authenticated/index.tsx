@@ -34,10 +34,10 @@ function useCountdown(target: Date) {
 function CountdownUnit({ value, label }: { value: number; label: string }) {
   return (
     <div className="flex flex-col items-center">
-      <span className="tabular-nums text-4xl font-bold text-stone-800 sm:text-5xl">
+      <span className="tabular-nums text-4xl font-bold sm:text-5xl">
         {String(value).padStart(2, '0')}
       </span>
-      <span className="mt-1 text-xs font-medium uppercase tracking-widest text-stone-400">
+      <span className="mt-1 text-xs font-medium uppercase tracking-widest">
         {label}
       </span>
     </div>
@@ -55,7 +55,7 @@ function Home() {
       </div>
 
       {/* Date & Countdown */}
-      <div className="border-b border-stone-100 bg-white px-4 py-8 text-center">
+      <div className="border-b border-stone-100 px-4 py-8 text-center">
         <p className="mb-6 font-serif text-xl text-stone-500 italic">
           May 15, 2027
         </p>
